@@ -26,12 +26,7 @@ This project demonstrates a rule-based chatbot integrated with a modern and real
 
 - Python
 - Flask
-- HTML5
-- CSS3
-- JavaScript (Fetch API)
-- Jinja2 Templates
 
 ---
 
-## 📂 Project Structure
 
