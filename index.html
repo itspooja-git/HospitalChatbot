@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hospital Assistant</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #2b5876, #4e4376);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .chat-wrapper {
+            width: 450px;
+            height: 650px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #0d6efd;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-header span {
+            margin-left: 10px;
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f4f6f9;
+        }
+
+        .message {
+            margin: 10px 0;
+            display: flex;
+        }
+
+        .user {
+            justify-content: flex-end;
+        }
+
+        .bot {
+            justify-content: flex-start;
+        }
+
+        .bubble {
+            max-width: 75%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-line;
+        }
+
+        .user .bubble {
+            background: #0d6efd;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot .bubble {
+            background: white;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .chat-input-area {
+            padding: 15px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-input-area input {
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        .send-area {
+            display: flex;
+        }
+
+        .send-area input {
+            flex: 1;
+            margin-bottom: 0;
+            margin-right: 5px;
+        }
+
+        .send-area button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 10px;
+            background: #0d6efd;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .send-area button:hover {
+            background: #084298;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #bbb;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="chat-wrapper">
+
+    <div class="chat-header">
+        🏥 <span>Hospital Virtual Assistant</span>
+    </div>
+
+    <div class="chat-box" id="chat-box">
+        <div class="message bot">
+            <div class="bubble">
+                Hello 👋 Welcome to our Hospital Assistant!  
+                Please enter your name below and ask your question.
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-input-area">
+        <input type="text" id="username" placeholder="Enter your name">
+
+        <div class="send-area">
+            <input type="text" id="user-input" placeholder="Type your message..." onkeypress="handleKey(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+function handleKey(event) {
+    if (event.key === "Enter") {
+        sendMessage();
+    }
+}
+
+function sendMessage() {
+
+    let userInput = document.getElementById("user-input").value;
+    let username = document.getElementById("username").value;
+    let chatBox = document.getElementById("chat-box");
+
+    if (userInput.trim() === "") return;
+
+    // Add user message
+    chatBox.innerHTML += `
+        <div class="message user">
+            <div class="bubble">${userInput}</div>
+        </div>
+    `;
+
+    fetch("/get", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "msg=" + encodeURIComponent(userInput) + 
+              "&username=" + encodeURIComponent(username)
+    })
+    .then(response => response.json())
+    .then(data => {
+        chatBox.innerHTML += `
+            <div class="message bot">
+                <div class="bubble">${data.response}</div>
+            </div>
+        `;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    document.getElementById("user-input").value = "";
+}
+
+</script>
+
+</body>
+</html>
